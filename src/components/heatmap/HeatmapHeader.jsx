@@ -1,6 +1,5 @@
 import React from 'react';
-import { Flame, Search, ExternalLink } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Flame, Search } from 'lucide-react';
 
 export default function HeatmapHeader({
   searchQuery = '',
@@ -41,8 +40,8 @@ export default function HeatmapHeader({
           )}
         </div>
 
-        {/* Center: Search Bar */}
-        <div className="flex-1 max-w-md mx-auto md:mx-4 w-full">
+        {/* Center/Right: Search Bar */}
+        <div className="flex-1 max-w-md md:ml-auto w-full">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -64,17 +63,6 @@ export default function HeatmapHeader({
               </kbd>
             </div>
           </form>
-        </div>
-
-        {/* Right: Citizen Portal Button */}
-        <div className="flex items-center justify-end gap-2 shrink-0">
-          <Link
-            to="/"
-            className="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200/80 text-xs font-bold px-3.5 py-2 rounded-xl shadow-2xs transition active:scale-95 cursor-pointer"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-            <span>Citizen Portal</span>
-          </Link>
         </div>
       </div>
     </header>

@@ -88,15 +88,7 @@ function DashboardRouter({
     )
   } else if (pathname === '/heatmap') {
     content = (
-      <div className="p-4 sm:p-6 w-full animate-in fade-in duration-300">
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            ML Heatmap & Hotspots
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Incident clustering and safety analytics (Module reserved for Seana).
-          </p>
-        </div>
+      <div className="w-full animate-in fade-in duration-300">
         <Heatmap authority={authority} isEmbedded={true} />
       </div>
     )
@@ -357,15 +349,7 @@ function PoliceDashboardRouter({ authority, onLogout }) {
     )
   } else if (pathname === '/heatmap') {
     content = (
-      <div className="p-4 sm:p-6 w-full animate-in fade-in duration-300">
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">
-            Police Safety Heatmap & Hotspots
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Incident clustering and safety analytics (Module reserved for Seana).
-          </p>
-        </div>
+      <div className="w-full animate-in fade-in duration-300">
         <Heatmap authority={authority} isEmbedded={true} />
       </div>
     )
