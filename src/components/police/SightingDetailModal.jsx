@@ -307,6 +307,35 @@ export default function SightingDetailModal({
                   </div>
                 </div>
 
+                {/* Citizen Suggested Person Banner (Informational Only - Not an AI Match) */}
+                {sighting?.citizen_note && (
+                  <div
+                    style={{
+                      marginTop: '1rem',
+                      padding: '0.85rem 1rem',
+                      borderRadius: 'var(--radius-md)',
+                      background: '#F1F5F9',
+                      border: '1px solid #CBD5E1',
+                      display: 'flex',
+                      gap: '0.65rem',
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <User size={18} color="#475569" style={{ marginTop: '0.15rem', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        Citizen Suggestion (Unverified)
+                      </div>
+                      <p style={{ margin: '0.25rem 0 0', fontSize: '0.84rem', color: '#1E293B', lineHeight: 1.45 }}>
+                        {sighting.citizen_note}
+                      </p>
+                      <span style={{ display: 'inline-block', marginTop: '0.35rem', fontSize: '0.72rem', color: '#64748B', fontStyle: 'italic' }}>
+                        Note: Citizen opinion only — not an AI match or confirmed identification.
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Officer Review & Verification Action Panel */}
                 <div
                   style={{

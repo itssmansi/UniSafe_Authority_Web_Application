@@ -1033,6 +1033,7 @@ export async function getSightings(isVerified = 'all', limit = null) {
       const cStatus = c?.status || 'Missing';
       return {
         ...record,
+        citizen_note: record.citizen_note || null,
         image_path: record.image_url,
         linked_case_code: c?.case_code || null,
         linked_case_name: c?.full_name || null,
