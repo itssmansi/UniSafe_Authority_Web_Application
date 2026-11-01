@@ -84,7 +84,13 @@ export default function NotificationDropdown({
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('all'); // 'all' | 'unread'
-  const [pushStatus, setPushStatus] = useState(getNotificationPermissionStatus());
+  const [pushStatus, setPushStatus] = useState(() => {
+    try {
+      return getNotificationPermissionStatus();
+    } catch {
+      return 'unsupported';
+    }
+  });
   const [isRequestingPush, setIsRequestingPush] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -123,10 +129,15 @@ export default function NotificationDropdown({
     );
 
     // Subscribe to Firebase foreground messages
-    const unsubscribeFcm = listenToForegroundMessages((payload) => {
-      loadNotifications();
-      playNotificationChime();
-    });
+    let unsubscribeFcm = () => {};
+    try {
+      unsubscribeFcm = listenToForegroundMessages((payload) => {
+        loadNotifications();
+        playNotificationChime();
+      });
+    } catch (e) {
+      console.warn('[NotificationDropdown] FCM listener error:', e);
+    }
 
     return () => {
       unsubscribeRealtime();

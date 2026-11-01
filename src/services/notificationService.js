@@ -109,39 +109,53 @@ export async function markAllNotificationsAsRead(authorityId) {
  * @returns {Function} Unsubscribe function
  */
 export function subscribeToAuthorityNotifications(authorityId, onNewNotification) {
-  if (!authorityId) return () => {};
+  const safeId = typeof authorityId === 'string' ? authorityId : (authorityId?.id || '');
+  if (!safeId || typeof safeId !== 'string') return () => {};
 
-  const channelName = `authority-notifications-${authorityId.slice(0, 8)}-${Date.now()}`;
-  const channel = supabase
-    .channel(channelName)
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `authority_id=eq.${authorityId}`,
-      },
-      (payload) => {
-        const raw = payload.new;
-        if (!raw) return;
-        const type = raw.notification_type || determineTypeFromTitle(raw.title);
-        const enriched = {
-          ...raw,
-          notification_type: type,
-          priority: determinePriority(type, raw.title),
-          metadata: typeof raw.metadata === 'object' && raw.metadata !== null ? raw.metadata : {},
-        };
-        if (typeof onNewNotification === 'function') {
-          onNewNotification(enriched);
+  try {
+    const channelName = `authority-notifications-${safeId.slice(0, 8)}-${Date.now()}`;
+    const channel = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `authority_id=eq.${safeId}`,
+        },
+        (payload) => {
+          try {
+            const raw = payload?.new;
+            if (!raw) return;
+            const type = raw.notification_type || determineTypeFromTitle(raw.title);
+            const enriched = {
+              ...raw,
+              notification_type: type,
+              priority: determinePriority(type, raw.title),
+              metadata: typeof raw.metadata === 'object' && raw.metadata !== null ? raw.metadata : {},
+            };
+            if (typeof onNewNotification === 'function') {
+              onNewNotification(enriched);
+            }
+          } catch (e) {
+            console.warn('[NotificationService] Callback error:', e);
+          }
         }
-      }
-    )
-    .subscribe();
+      )
+      .subscribe();
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
+    return () => {
+      try {
+        supabase.removeChannel(channel);
+      } catch (e) {
+        // ignore
+      }
+    };
+  } catch (err) {
+    console.warn('[NotificationService] Subscription error:', err);
+    return () => {};
+  }
 }
 
 /**
