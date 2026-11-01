@@ -15,12 +15,13 @@ import { getSightingDetail, findSightingMatches, updateSightingVerification } fr
 
 export default function SightingDetailModal({
   sightingId,
+  initialSighting = null,
   isOpen,
   onClose,
   onOpenCaseDossier,
   onSightingUpdated
 }) {
-  const [sighting, setSighting] = useState(null);
+  const [sighting, setSighting] = useState(initialSighting);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imageError, setImageError] = useState(false);
@@ -47,7 +48,7 @@ export default function SightingDetailModal({
 
   const fetchSighting = () => {
     if (!sightingId) return;
-    setLoading(true);
+    setLoading(!initialSighting && !sighting);
     setError(null);
     setImageError(false);
     setMatchingError(null);
@@ -58,7 +59,23 @@ export default function SightingDetailModal({
     getSightingDetail(sightingId)
       .then((data) => {
         const resolved = data?.sighting && data?.signed_image_url ? data : (data?.sighting || data);
-        setSighting(resolved);
+        setSighting((prev) => ({
+          ...(initialSighting || {}),
+          ...(prev || {}),
+          ...(resolved || {}),
+          address:
+            resolved?.address ||
+            resolved?.sighting?.address ||
+            prev?.address ||
+            initialSighting?.address ||
+            null,
+          contact_email:
+            resolved?.contact_email ||
+            resolved?.sighting?.contact_email ||
+            prev?.contact_email ||
+            initialSighting?.contact_email ||
+            null,
+        }));
       })
       .catch((err) => {
         console.error('[UniSafe Sighting Preview] Failed to retrieve sighting details:', {
@@ -68,13 +85,18 @@ export default function SightingDetailModal({
           errorData: err.data,
           error: err,
         });
-        setError(err.message || 'Could not fetch sighting details');
+        if (!initialSighting && !sighting) {
+          setError(err.message || 'Could not fetch sighting details');
+        }
       })
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     if (isOpen && sightingId) {
+      if (initialSighting) {
+        setSighting(initialSighting);
+      }
       fetchSighting();
     }
   }, [isOpen, sightingId]);
@@ -161,6 +183,33 @@ export default function SightingDetailModal({
   // Derive candidate cases list from either enriched candidate_cases or raw ai_matches
   const candidateCases = sighting?.candidate_cases || [];
 
+  // Resolve citizen-entered address from top-level response, nested sighting object, or initialSighting prop
+  const resolvedAddress =
+    (typeof sighting?.address === 'string' && sighting.address.trim())
+      ? sighting.address.trim()
+      : (typeof sighting?.sighting?.address === 'string' && sighting.sighting.address.trim())
+      ? sighting.sighting.address.trim()
+      : (typeof initialSighting?.address === 'string' && initialSighting.address.trim())
+      ? initialSighting.address.trim()
+      : (typeof initialSighting?.sighting?.address === 'string' && initialSighting.sighting.address.trim())
+      ? initialSighting.sighting.address.trim()
+      : null;
+
+  // Resolve reporter contact email from top-level response, nested sighting object, or initialSighting prop
+  const resolvedContactEmail =
+    (typeof sighting?.contact_email === 'string' && sighting.contact_email.trim())
+      ? sighting.contact_email.trim()
+      : (typeof sighting?.sighting?.contact_email === 'string' && sighting.sighting.contact_email.trim())
+      ? sighting.sighting.contact_email.trim()
+      : (typeof initialSighting?.contact_email === 'string' && initialSighting.contact_email.trim())
+      ? initialSighting.contact_email.trim()
+      : (typeof initialSighting?.sighting?.contact_email === 'string' && initialSighting.sighting.contact_email.trim())
+      ? initialSighting.sighting.contact_email.trim()
+      : null;
+
+  const displayLat = sighting?.latitude ?? sighting?.sighting?.latitude ?? initialSighting?.latitude ?? null;
+  const displayLon = sighting?.longitude ?? sighting?.sighting?.longitude ?? initialSighting?.longitude ?? null;
+
   return (
     <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
       <div className="modal-dialog wide" onClick={(e) => e.stopPropagation()}>
@@ -168,7 +217,7 @@ export default function SightingDetailModal({
         <div className="modal-header">
           <div className="modal-header-titles">
             <span className="case-code-pill" style={{ width: 'fit-content', marginBottom: '0.25rem' }}>
-              Sighting Review: {sighting?.id ? sighting.id.substring(0, 8) + '...' : 'Loading'}
+              Sighting Review: {sighting?.id ? sighting.id.substring(0, 8) + '...' : (sightingId ? sightingId.substring(0, 8) + '...' : 'Loading')}
             </span>
             <h2 className="modal-title">Citizen Sighting Verification Station</h2>
           </div>
@@ -286,11 +335,23 @@ export default function SightingDetailModal({
 
                 <div style={{ marginTop: '1rem' }}>
                   <div className="dossier-row">
-                    <span className="dossier-label">Coordinates</span>
-                    <span className="dossier-value">
-                      {sighting?.latitude && sighting?.longitude
-                        ? `${sighting.latitude.toFixed(4)}, ${sighting.longitude.toFixed(4)}`
-                        : 'Not provided'}
+                    <span className="dossier-label">Address</span>
+                    <span className="dossier-value" style={{ wordBreak: 'break-word' }}>
+                      {resolvedAddress || 'Address not provided'}
+                    </span>
+                  </div>
+                  {displayLat != null && displayLon != null && (
+                    <div className="dossier-row">
+                      <span className="dossier-label">Coordinates</span>
+                      <span className="dossier-value">
+                        {`${Number(displayLat).toFixed(4)}, ${Number(displayLon).toFixed(4)}`}
+                      </span>
+                    </div>
+                  )}
+                  <div className="dossier-row">
+                    <span className="dossier-label">Reporter Contact Email</span>
+                    <span className="dossier-value" style={{ wordBreak: 'break-word' }}>
+                      {resolvedContactEmail || 'Not provided'}
                     </span>
                   </div>
                   <div className="dossier-row">

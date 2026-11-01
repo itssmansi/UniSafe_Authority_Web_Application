@@ -172,13 +172,27 @@ export default function SightingsQueue({ onSelectSighting, refreshTrigger }) {
                     )}
                   </td>
                   <td>
-                    {s.latitude && s.longitude ? (
+                    {s.address ? (
+                      <div>
+                        <span className="location-cell" title={s.address}>
+                          <MapPin size={13} style={{ flexShrink: 0 }} />
+                          <span style={{ maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', verticalAlign: 'middle' }}>
+                            {s.address}
+                          </span>
+                        </span>
+                        {s.latitude != null && s.longitude != null && (
+                          <div style={{ fontSize: '0.72rem', color: 'var(--color-text-light)', marginTop: '2px', paddingLeft: '1.25rem' }}>
+                            {Number(s.latitude).toFixed(3)}, {Number(s.longitude).toFixed(3)}
+                          </div>
+                        )}
+                      </div>
+                    ) : s.latitude != null && s.longitude != null ? (
                       <span className="location-cell">
                         <MapPin size={13} />
-                        {s.latitude.toFixed(3)}, {s.longitude.toFixed(3)}
+                        {Number(s.latitude).toFixed(3)}, {Number(s.longitude).toFixed(3)}
                       </span>
                     ) : (
-                      <span style={{ color: 'var(--color-text-light)', fontSize: '0.8rem' }}>Coordinates N/A</span>
+                      <span style={{ color: 'var(--color-text-light)', fontSize: '0.8rem' }}>Location not provided</span>
                     )}
                   </td>
                   <td>

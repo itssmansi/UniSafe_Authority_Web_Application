@@ -479,6 +479,7 @@ function PoliceDashboardRouter({ authority, onLogout }) {
       {/* Sighting Details Modal */}
       <SightingDetailModal
         sightingId={selectedSightingId}
+        initialSighting={selectedSightingId ? sightings.find((s) => s.id === selectedSightingId) || null : null}
         isOpen={Boolean(selectedSightingId)}
         onClose={() => setSelectedSightingId(null)}
         onOpenCaseDossier={(caseId) => setSelectedCaseId(caseId)}

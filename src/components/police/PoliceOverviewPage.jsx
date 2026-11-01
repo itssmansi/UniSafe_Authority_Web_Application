@@ -327,10 +327,20 @@ export default function PoliceOverviewPage({
                       </div>
 
                       <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-2">
-                        {s.latitude && s.longitude && (
+                        {s.address ? (
+                          <span className="inline-flex items-center gap-1 truncate" title={s.address}>
+                            <MapPin className="size-3 text-muted-foreground" />
+                            {s.address}
+                          </span>
+                        ) : s.latitude && s.longitude ? (
                           <span className="inline-flex items-center gap-1 truncate">
                             <MapPin className="size-3 text-muted-foreground" />
                             {Number(s.latitude).toFixed(3)}, {Number(s.longitude).toFixed(3)}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 truncate">
+                            <MapPin className="size-3 text-muted-foreground" />
+                            Location not provided
                           </span>
                         )}
                         {s.created_at && (
