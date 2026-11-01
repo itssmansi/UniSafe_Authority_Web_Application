@@ -97,7 +97,7 @@ function DashboardRouter({
             Incident clustering and safety analytics (Module reserved for Seana).
           </p>
         </div>
-        <Heatmap />
+        <Heatmap authority={authority} isEmbedded={true} />
       </div>
     )
   } else if (pathname === '/bmc-officers' || pathname === '/officers') {
@@ -189,11 +189,30 @@ function DashboardRouter({
     )
   }
 
+  const handleSelectComplaintFromNotif = (complaintOrId) => {
+    if (!complaintOrId) return;
+    if (typeof complaintOrId === 'object' && (complaintOrId.title || complaintOrId.status)) {
+      onSelectComplaint(complaintOrId);
+    } else {
+      const id = typeof complaintOrId === 'string' ? complaintOrId : complaintOrId.id;
+      const found = complaints.find((c) => c.id === id);
+      if (found) {
+        onSelectComplaint(found);
+      } else {
+        onSelectComplaint({ id });
+      }
+    }
+  };
+
   return (
-    <DashboardLayout authority={authority} onLogout={onLogout}>
+    <DashboardLayout
+      authority={authority}
+      onLogout={onLogout}
+      onSelectComplaint={handleSelectComplaintFromNotif}
+    >
       {content}
     </DashboardLayout>
-  )
+  );
 }
 
 // ============================================================
@@ -347,7 +366,7 @@ function PoliceDashboardRouter({ authority, onLogout }) {
             Incident clustering and safety analytics (Module reserved for Seana).
           </p>
         </div>
-        <Heatmap />
+        <Heatmap authority={authority} isEmbedded={true} />
       </div>
     )
   } else if (pathname === '/settings') {
@@ -455,7 +474,12 @@ function PoliceDashboardRouter({ authority, onLogout }) {
 
   return (
     <>
-      <DashboardLayout authority={authority} onLogout={onLogout}>
+      <DashboardLayout
+        authority={authority}
+        onLogout={onLogout}
+        onSelectCase={(id) => setSelectedCaseId(id)}
+        onSelectSighting={(id) => setSelectedSightingId(id)}
+      >
         {content}
       </DashboardLayout>
 

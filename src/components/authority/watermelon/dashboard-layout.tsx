@@ -10,6 +10,9 @@ type DashboardLayoutProps = {
   onLogout?: () => void
   searchQuery?: string
   setSearchQuery?: (query: string) => void
+  onSelectComplaint?: (complaint: any) => void
+  onSelectSighting?: (sightingId: string) => void
+  onSelectCase?: (caseId: string) => void
 }
 
 export default function DashboardLayout({
@@ -18,6 +21,9 @@ export default function DashboardLayout({
   onLogout,
   searchQuery,
   setSearchQuery,
+  onSelectComplaint,
+  onSelectSighting,
+  onSelectCase,
 }: DashboardLayoutProps) {
   return (
     <SidebarProvider
@@ -38,6 +44,10 @@ export default function DashboardLayout({
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             department={authority?.department}
+            authority={authority}
+            onSelectComplaint={onSelectComplaint}
+            onSelectSighting={onSelectSighting}
+            onSelectCase={onSelectCase}
           />
           <div className="flex-1 overflow-y-auto no-scrollbar">{children}</div>
         </div>

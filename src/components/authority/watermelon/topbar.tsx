@@ -9,15 +9,24 @@ import {
 } from '@/components/ui/input-group'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { navigationGroups, policeNavigationGroups } from './data'
+import NotificationDropdown from '@/components/notifications/NotificationDropdown'
 
 export function DashboardTopbar({
   searchQuery,
   setSearchQuery,
   department,
+  authority,
+  onSelectComplaint,
+  onSelectSighting,
+  onSelectCase,
 }: {
   searchQuery?: string
   setSearchQuery?: (query: string) => void
   department?: string
+  authority?: any
+  onSelectComplaint?: (complaint: any) => void
+  onSelectSighting?: (sightingId: string) => void
+  onSelectCase?: (caseId: string) => void
 }) {
   const { pathname } = useDashboardNavigation()
   const [localSearchQuery, setLocalSearchQuery] = useState('')
@@ -128,29 +137,44 @@ export function DashboardTopbar({
             </div>
           </div>
 
-          <InputGroup className="hidden h-9 w-72 shrink-0 rounded-lg border border-border/50 bg-secondary/60 py-1 pr-2 pl-2.5 md:flex focus-within:border-primary/50 focus-within:bg-background transition-all">
-            <InputGroupAddon className="gap-1.5 p-0 text-muted-foreground">
-              <SearchIcon className="size-3.5" />
-            </InputGroupAddon>
-            <InputGroupInput
-              ref={searchInputRef}
-              className="h-full p-0 px-1 text-xs placeholder:text-muted-foreground"
-              aria-label="Search complaints and staff"
-              placeholder="Search complaints, wards, staff..."
-              value={activeQuery}
-              onChange={(event) => handleQueryChange(event.target.value)}
-            />
-            {activeQuery === '' ? (
-              <InputGroupAddon align="inline-end" className="p-0 text-muted-foreground">
-                <div className="flex h-5 w-8 items-center justify-center gap-1 rounded bg-background/80 border border-border/40 p-1">
-                  <CommandIcon className="size-2.5" />
-                  <span className="text-[10px] font-semibold leading-none">K</span>
-                </div>
+          <div className="hidden md:flex items-center gap-3">
+            <InputGroup className="h-9 w-72 shrink-0 rounded-lg border border-border/50 bg-secondary/60 py-1 pr-2 pl-2.5 flex focus-within:border-primary/50 focus-within:bg-background transition-all">
+              <InputGroupAddon className="gap-1.5 p-0 text-muted-foreground">
+                <SearchIcon className="size-3.5" />
               </InputGroupAddon>
-            ) : null}
-          </InputGroup>
+              <InputGroupInput
+                ref={searchInputRef}
+                className="h-full p-0 px-1 text-xs placeholder:text-muted-foreground"
+                aria-label="Search complaints and staff"
+                placeholder="Search complaints, wards, staff..."
+                value={activeQuery}
+                onChange={(event) => handleQueryChange(event.target.value)}
+              />
+              {activeQuery === '' ? (
+                <InputGroupAddon align="inline-end" className="p-0 text-muted-foreground">
+                  <div className="flex h-5 w-8 items-center justify-center gap-1 rounded bg-background/80 border border-border/40 p-1">
+                    <CommandIcon className="size-2.5" />
+                    <span className="text-[10px] font-semibold leading-none">K</span>
+                  </div>
+                </InputGroupAddon>
+              ) : null}
+            </InputGroup>
+
+            <NotificationDropdown
+              authority={authority}
+              onSelectComplaint={onSelectComplaint}
+              onSelectSighting={onSelectSighting}
+              onSelectCase={onSelectCase}
+            />
+          </div>
 
           <div className="flex items-center gap-2 md:hidden">
+            <NotificationDropdown
+              authority={authority}
+              onSelectComplaint={onSelectComplaint}
+              onSelectSighting={onSelectSighting}
+              onSelectCase={onSelectCase}
+            />
             <Button
               type="button"
               variant="ghost"
