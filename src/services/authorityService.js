@@ -1,4 +1,3 @@
-import { createAuthorityNotification, NOTIFICATION_TYPES } from "./notificationService.js";
 import { supabase } from './supabase.js';
 
 const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:5000/api';
@@ -299,66 +298,6 @@ export async function assignComplaintToOfficer(complaintId, officerId, reason = 
     return data;
   } catch (err) {
     console.error('Error assigning complaint to officer:', err);
-    throw err;
-  }
-}
-
-/**
- * Record a citizen verification dispute on a completed complaint
- * Sets status to "disputed" and dispatches notification to assigned BMC officer
- */
-export async function recordVerificationDispute({
-  complaintId,
-  citizenResponse = "unresolved",
-  remarks = "",
-}) {
-  try {
-    const { data: complaint, error: fetchErr } = await supabase
-      .from('complaints')
-      .select('*')
-      .eq('id', complaintId)
-      .single();
-
-    if (fetchErr || !complaint) {
-      throw new Error(fetchErr?.message || 'Complaint not found');
-    }
-
-    const { data: updatedComplaint, error: updateErr } = await supabase
-      .from('complaints')
-      .update({
-        status: 'disputed',
-      })
-      .eq('id', complaintId)
-      .select()
-      .maybeSingle();
-
-    if (updateErr) {
-      console.warn('Update complaint status error:', updateErr.message);
-    }
-
-    if (complaint.assigned_authority_id) {
-      await createAuthorityNotification({
-        authorityId: complaint.assigned_authority_id,
-        title: 'Completion Verification Failed',
-        body: `The citizen has reported that complaint #${complaint.id.slice(0, 8)} (${complaint.category || 'civic issue'}) is still unresolved. Remarks: "${remarks || 'Issue not resolved.'}"`,
-        department: 'BMC',
-        notificationType: NOTIFICATION_TYPES.VERIFICATION_DISPUTED,
-        referenceId: complaint.id,
-        referenceType: 'complaint',
-        metadata: {
-          complaint_id: complaint.id,
-          category: complaint.category,
-          location: complaint.address || complaint.jurisdiction,
-          citizen_response: citizenResponse,
-          remarks: remarks,
-          verified_at: new Date().toISOString(),
-        },
-      });
-    }
-
-    return updatedComplaint || complaint;
-  } catch (err) {
-    console.error('Error recording verification dispute:', err);
     throw err;
   }
 }

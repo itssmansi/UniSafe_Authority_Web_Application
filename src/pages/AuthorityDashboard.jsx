@@ -181,27 +181,8 @@ function DashboardRouter({
     )
   }
 
-  const handleSelectComplaintFromNotif = (complaintOrId) => {
-    if (!complaintOrId) return;
-    if (typeof complaintOrId === 'object' && (complaintOrId.title || complaintOrId.status)) {
-      onSelectComplaint(complaintOrId);
-    } else {
-      const id = typeof complaintOrId === 'string' ? complaintOrId : complaintOrId.id;
-      const found = complaints.find((c) => c.id === id);
-      if (found) {
-        onSelectComplaint(found);
-      } else {
-        onSelectComplaint({ id });
-      }
-    }
-  };
-
   return (
-    <DashboardLayout
-      authority={authority}
-      onLogout={onLogout}
-      onSelectComplaint={handleSelectComplaintFromNotif}
-    >
+    <DashboardLayout authority={authority} onLogout={onLogout}>
       {content}
     </DashboardLayout>
   );
@@ -458,12 +439,7 @@ function PoliceDashboardRouter({ authority, onLogout }) {
 
   return (
     <>
-      <DashboardLayout
-        authority={authority}
-        onLogout={onLogout}
-        onSelectCase={(id) => setSelectedCaseId(id)}
-        onSelectSighting={(id) => setSelectedSightingId(id)}
-      >
+      <DashboardLayout authority={authority} onLogout={onLogout}>
         {content}
       </DashboardLayout>
 
