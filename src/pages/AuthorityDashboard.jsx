@@ -97,7 +97,7 @@ function DashboardRouter({
             Incident clustering and safety analytics (Module reserved for Seana).
           </p>
         </div>
-        <Heatmap />
+        <Heatmap authority={authority} isEmbedded={true} />
       </div>
     )
   } else if (pathname === '/bmc-officers' || pathname === '/officers') {
@@ -347,7 +347,7 @@ function PoliceDashboardRouter({ authority, onLogout }) {
             Incident clustering and safety analytics (Module reserved for Seana).
           </p>
         </div>
-        <Heatmap />
+        <Heatmap authority={authority} isEmbedded={true} />
       </div>
     )
   } else if (pathname === '/settings') {
