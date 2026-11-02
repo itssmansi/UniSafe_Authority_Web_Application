@@ -38,10 +38,17 @@ export default function ResolutionModal({ task, onClose, onSuccess }) {
       }
 
       if (!apiSuccess) {
-        await supabase.from('complaints').update({
-          authority_image_url: urlData.publicUrl,
-          status: 'in-review'
-        }).eq('id', task.id);
+        const { error: rpcErr } = await supabase.rpc('submit_complaint_resolution', {
+          p_complaint_id: task.id,
+          p_authority_image_url: urlData.publicUrl
+        });
+        if (rpcErr) {
+          console.warn('RPC submit_complaint_resolution fallback:', rpcErr);
+          await supabase.from('complaints').update({
+            authority_image_url: urlData.publicUrl,
+            status: 'in-review'
+          }).eq('id', task.id);
+        }
       }
       
       onSuccess(urlData.publicUrl);

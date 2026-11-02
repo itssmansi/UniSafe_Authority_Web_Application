@@ -645,7 +645,14 @@ export default function KanbanBoard({ hideHeader = false, initialOfficers = [] }
         newColumn === 'in-progress' ? 'in-progress' :
         newColumn === 'in-review' ? 'in-review' :
         newColumn === 'done' ? 'resolved' : 'pending';
-      await supabase.from('complaints').update({ status: complaintStatus }).eq('id', taskId);
+      const { error: rpcErr } = await supabase.rpc('update_complaint_status', {
+        p_complaint_id: taskId,
+        p_status: complaintStatus
+      });
+      if (rpcErr) {
+        console.warn('RPC update_complaint_status fallback:', rpcErr);
+        await supabase.from('complaints').update({ status: complaintStatus }).eq('id', taskId);
+      }
     } catch (dbErr) {
       console.error("Supabase status update error:", dbErr);
     }

@@ -89,6 +89,12 @@ export async function getAuthorities() {
  */
 export async function updateComplaintStatus(complaintId, authorityId, newStatus) {
   try {
+    const { data: rpcData, error: rpcErr } = await supabase.rpc('update_complaint_status', {
+      p_complaint_id: complaintId,
+      p_status: newStatus
+    });
+    if (!rpcErr && rpcData) return rpcData;
+
     // Direct Supabase update
     const { data, error } = await supabase
       .from('complaints')
