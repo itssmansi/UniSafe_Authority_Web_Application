@@ -238,8 +238,8 @@ function PoliceDashboardRouter({ authority, onLogout }) {
       const allLoadedCases = casesRes?.missing_persons || []
       const stationCases = authority?.jurisdiction
         ? allLoadedCases.filter(
-            (c) => !c.jurisdiction || c.jurisdiction.toLowerCase() === authority.jurisdiction.toLowerCase()
-          )
+          (c) => !c.jurisdiction || c.jurisdiction.toLowerCase() === authority.jurisdiction.toLowerCase()
+        )
         : allLoadedCases
 
       setCases(stationCases)
